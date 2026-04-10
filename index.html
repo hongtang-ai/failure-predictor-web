@@ -3,110 +3,160 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent Failure Predictor</title>
+  <title>Structural Failure Predictor — AI Agents</title>
   <style>
     :root {
-      --bg-1: #f1f3f6;
-      --bg-2: #e9edf2;
-      --card: #ffffff;
+      --bg: #ffffff;
+      --surface: #fafafa;
       --text: #0f172a;
       --muted: #64748b;
-      --border: rgba(15, 23, 42, 0.08);
-      --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 10px 28px rgba(15, 23, 42, 0.07);
-      --shadow-hover: 0 4px 14px rgba(15, 23, 42, 0.08), 0 18px 44px rgba(15, 23, 42, 0.1);
+      --border: #e2e8f0;
+      --accent: #0f172a;
+      --red: #dc2626;
       --green: #15803d;
-      --green-soft: #dcfce7;
-      --yellow: #a16207;
-      --yellow-soft: #fef9c3;
-      --red: #b91c1c;
-      --red-soft: #fee2e2;
-      --accent-a: #22c55e;
-      --accent-b: #15803d;
+      --amber: #b45309;
     }
 
     * { box-sizing: border-box; }
 
-    html, body {
-      margin: 0;
-      min-height: 100%;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
-      font-family: Arial, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      background: linear-gradient(165deg, var(--bg-1), var(--bg-2));
-      line-height: 1.45;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
     }
 
-    .page-wrap {
-      max-width: 1100px;
+    .container {
+      max-width: 900px;
       margin: 0 auto;
-      min-height: 100vh;
+      padding: 0 24px 80px;
     }
 
-    .app {
-      display: grid;
-      grid-template-columns: minmax(260px, 300px) 1fr;
-      min-height: 100vh;
+    .hero {
+      padding: 72px 0 56px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
     }
 
-    @media (max-width: 860px) {
-      .app { grid-template-columns: 1fr; }
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      max-width: 16em;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    .sidebar {
-      padding: 24px 22px 28px;
-      border-right: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(10px);
+    .hero p {
+      margin: 0;
+      font-size: clamp(16px, 2.2vw, 19px);
+      color: var(--muted);
+      font-weight: 450;
+      max-width: 28em;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    @media (max-width: 860px) {
-      .sidebar {
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
+    section {
+      padding: 48px 0;
+      border-bottom: 1px solid var(--border);
     }
 
-    .sidebar h2 {
-      margin: 0 0 6px;
+    section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-label {
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--muted);
+      margin-bottom: 12px;
     }
 
-    .sidebar-title {
-      margin: 0 0 22px;
-      font-size: 20px;
+    h2 {
+      margin: 0 0 20px;
+      font-size: 24px;
       font-weight: 700;
       letter-spacing: -0.02em;
     }
 
-    .field { margin-bottom: 20px; }
+    .prose {
+      font-size: 16px;
+      color: #334155;
+      max-width: 38em;
+    }
 
-    .field > label {
+    .prose p {
+      margin: 0 0 14px;
+    }
+
+    .prose p:last-child {
+      margin-bottom: 0;
+    }
+
+    .prose strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .solution-lead {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text);
+      margin: 0;
+      max-width: 32em;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 720px) {
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .field label {
       display: block;
       font-size: 12px;
       font-weight: 600;
+      color: var(--text);
       margin-bottom: 8px;
-    }
-
-    .field-hint {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 6px;
     }
 
     input[type="range"] {
       width: 100%;
-      height: 5px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #bbf7d0, #fef08a, #fecaca);
+      height: 4px;
+      border-radius: 99px;
+      background: var(--border);
       appearance: none;
-      outline: none;
     }
 
     input[type="range"]::-webkit-slider-thumb {
@@ -114,863 +164,647 @@
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background: #fff;
-      border: 2px solid var(--text);
-      box-shadow: 0 1px 6px rgba(15, 23, 42, 0.12);
+      background: var(--accent);
       cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
     }
 
-    input[type="range"]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #fff;
-      border: 2px solid var(--text);
-      cursor: pointer;
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
     }
 
-    .toggle-row {
+    .toggle-line {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
     }
 
-    .toggle-row span { font-size: 13px; font-weight: 500; }
+    .toggle-line span {
+      font-size: 14px;
+    }
 
-    .switch {
+    .sw {
       position: relative;
       width: 44px;
       height: 26px;
       flex-shrink: 0;
     }
 
-    .switch input {
+    .sw input {
       opacity: 0;
       width: 0;
       height: 0;
     }
 
-    .switch-slider {
+    .sw-ui {
       position: absolute;
       inset: 0;
-      background: #e2e8f0;
-      border-radius: 999px;
+      background: #cbd5e1;
+      border-radius: 99px;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background 0.2s;
     }
 
-    .switch-slider::before {
+    .sw-ui::before {
       content: "";
       position: absolute;
-      height: 20px;
       width: 20px;
+      height: 20px;
       left: 3px;
       top: 3px;
       background: #fff;
       border-radius: 50%;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
-      transition: transform 0.2s ease;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
     }
 
-    .switch input:checked + .switch-slider {
-      background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+    .sw input:checked + .sw-ui {
+      background: var(--accent);
     }
 
-    .switch input:checked + .switch-slider::before {
+    .sw input:checked + .sw-ui::before {
       transform: translateX(18px);
     }
 
-    select.depth {
+    select {
       width: 100%;
       padding: 10px 12px;
-      font-size: 13px;
+      font-size: 14px;
       font-family: inherit;
       border: 1px solid var(--border);
       border-radius: 8px;
-      background: var(--card);
+      background: #fff;
       cursor: pointer;
     }
 
-    .btn-analyze {
+    .btn {
       width: 100%;
-      margin-top: 6px;
-      padding: 12px 16px;
+      margin-top: 20px;
+      padding: 12px 20px;
       font-size: 14px;
       font-weight: 600;
       font-family: inherit;
       color: #fff;
+      background: var(--accent);
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      background: linear-gradient(135deg, #4ade80, var(--accent-a), var(--accent-b));
-      box-shadow: 0 3px 12px rgba(22, 163, 74, 0.3);
-      transition: transform 0.15s ease, box-shadow 0.2s ease;
     }
 
-    .btn-analyze:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 5px 16px rgba(22, 163, 74, 0.38);
+    .btn:hover {
+      opacity: 0.92;
     }
 
-    .main {
-      padding: 24px 22px max(48px, calc(2.5rem + env(safe-area-inset-bottom, 0px)));
-      overflow-x: hidden;
-    }
-
-    .main-head { margin-bottom: 22px; }
-
-    .main-head h1 {
-      margin: 0;
-      font-size: clamp(21px, 3.5vw, 26px);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-    }
-
-    .main-head p {
-      margin: 6px 0 0;
-      font-size: 13px;
-      color: var(--muted);
-      max-width: 480px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
-
-    @media (max-width: 900px) {
-      .cards { grid-template-columns: 1fr; }
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 22px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      transition: box-shadow 0.25s ease, transform 0.2s ease;
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-hover);
-      transform: translateY(-2px);
-    }
-
-    .card.span-2 {
-      grid-column: span 2;
-    }
-
-    @media (max-width: 900px) {
-      .card.span-2 { grid-column: span 1; }
-    }
-
-    .card-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
-
-    .health-body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .score-caption {
-      font-size: 11px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    .ring-wrap {
-      position: relative;
-      width: 132px;
-      height: 132px;
-    }
-
-    .ring-wrap svg {
-      transform: rotate(-90deg);
-      width: 132px;
-      height: 132px;
-    }
-
-    .ring-bg {
-      fill: none;
-      stroke: #e8ecf0;
-      stroke-width: 9;
-    }
-
-    .ring-fg {
-      fill: none;
-      stroke: url(#ringGrad);
-      stroke-width: 9;
-      stroke-linecap: round;
-      stroke-dasharray: 339.292;
-      stroke-dashoffset: 339.292;
-      transition: stroke-dashoffset 0.65s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .ring-center {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .ring-pct {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      line-height: 1.1;
-    }
-
-    .ring-pct small {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-    }
-
-    .status-pill {
-      display: inline-flex;
-      padding: 5px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-    }
-
-    .status-pill.high { background: var(--green-soft); color: var(--green); }
-    .status-pill.medium { background: var(--yellow-soft); color: var(--yellow); }
-    .status-pill.low { background: var(--red-soft); color: var(--red); }
-
-    .paper-k {
+    .out-k {
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
       margin-bottom: 4px;
+      margin-top: 16px;
     }
 
-    .paper-v {
-      font-size: 14px;
-      margin-bottom: 14px;
-      font-variant-numeric: tabular-nums;
+    .out-k:first-child {
+      margin-top: 0;
     }
 
-    .paper-v:last-child { margin-bottom: 0; }
-
-    .pred-main {
-      font-size: clamp(26px, 4.5vw, 32px);
+    .out-pred {
+      font-size: clamp(28px, 5vw, 36px);
       font-weight: 800;
       letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 16px;
+      margin: 0;
+      line-height: 1.1;
     }
 
-    .pred-main.danger { color: var(--red); }
-    .pred-main.safe { color: var(--green); }
-    .pred-main.warn { color: #b45309; }
+    .out-pred.exp { color: var(--red); }
+    .out-pred.loop, .out-pred.drift { color: var(--amber); }
+    .out-pred.ok { color: var(--green); }
 
-    .reason-box {
-      margin-top: 4px;
-      padding: 12px 14px;
+    .out-v {
+      font-size: 15px;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .viz-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .viz-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .viz-card h3 {
+      margin: 0 0 14px;
       font-size: 13px;
-      background: #f8fafc;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    .traj-track {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 6px 2px;
-      margin-top: 4px;
-    }
-
-    .traj-node {
-      padding: 7px 12px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #fff;
-      white-space: nowrap;
-    }
-
-    .traj-node.n1 { background: linear-gradient(135deg, #22c55e, #16a34a); }
-    .traj-node.n2 { background: linear-gradient(135deg, #84cc16, #ca8a04); }
-    .traj-node.n3 { background: linear-gradient(135deg, #f59e0b, #ea580c); }
-    .traj-node.n4 { background: linear-gradient(135deg, #ef4444, #b91c1c); }
-
-    .traj-arrow {
-      color: var(--muted);
-      font-weight: 700;
-      font-size: 12px;
-    }
-
-    .anim-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0 4px;
-      padding: 18px 8px;
-      min-height: 72px;
-    }
-
-    .anim-item {
-      display: flex;
-      align-items: center;
-    }
-
-    .anim-node {
-      padding: 10px 16px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #fff;
-      opacity: 0.28;
-      transform: scale(1);
-      filter: saturate(0.65);
-      transition:
-        opacity 0.35s ease,
-        transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1),
-        filter 0.35s ease,
-        box-shadow 0.35s ease;
-    }
-
-    .anim-node.a1 { background: linear-gradient(135deg, #22c55e, #15803d); }
-    .anim-node.a2 { background: linear-gradient(135deg, #a3e635, #ca8a04); }
-    .anim-node.a3 { background: linear-gradient(135deg, #fbbf24, #ea580c); }
-    .anim-node.a4 { background: linear-gradient(135deg, #f87171, #b91c1c); }
-
-    .anim-node.active {
-      opacity: 1;
-      transform: scale(1.3);
-      filter: saturate(1);
-      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.18);
-      z-index: 2;
-    }
-
-    .anim-node.past {
-      opacity: 0.85;
-      transform: scale(1);
-      filter: saturate(0.9);
-    }
-
-    .anim-arrow {
-      color: var(--muted);
-      font-weight: 700;
-      font-size: 13px;
-      padding: 0 6px;
-      opacity: 0.35;
-      transition: opacity 0.3s ease;
-    }
-
-    .anim-arrow.lit { opacity: 1; }
-
-    .phase-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .phase-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px 16px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .phase-legend span::before {
-      content: "";
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 2px;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
-
-    .phase-legend .lg-safe::before { background: #22c55e; }
-    .phase-legend .lg-risk::before { background: #eab308; }
-    .phase-legend .lg-fail::before { background: #ef4444; }
-
-    .phase-box {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1;
-      max-height: 260px;
-      margin: 0 auto;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: linear-gradient(to top right, #22c55e 0%, #eab308 52%, #ef4444 100%);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
-    }
-
-    .phase-axis {
-      position: absolute;
-      font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: rgba(15, 23, 42, 0.55);
+      color: var(--muted);
     }
 
-    .phase-axis.c-left { left: 8px; bottom: 6px; }
-    .phase-axis.c-right { right: 8px; bottom: 6px; }
-    .phase-axis.s-top { left: 8px; top: 6px; }
-    .phase-axis.s-bot { left: 8px; bottom: 22px; }
+    .traj {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px 4px;
+    }
+
+    .traj span.node {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .traj span.node.c1 { background: #334155; }
+    .traj span.node.c2 { background: #64748b; }
+    .traj span.node.c3 { background: #94a3b8; }
+    .traj span.node.c4 { background: #dc2626; }
+
+    .traj span.node.ok4 { background: #15803d; }
+
+    .traj span.arr {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .phase-box {
+      position: relative;
+      aspect-ratio: 1;
+      max-height: 220px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: linear-gradient(to top right, #bbf7d0 0%, #fef08a 50%, #fecaca 100%);
+    }
 
     .phase-inner {
       position: absolute;
-      left: 28px;
+      left: 24px;
       right: 10px;
-      top: 28px;
-      bottom: 28px;
-      background: rgba(255, 255, 255, 0.12);
+      top: 24px;
+      bottom: 24px;
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 6px;
     }
 
     .phase-dot {
       position: absolute;
-      width: 12px;
-      height: 12px;
-      margin-left: -6px;
-      margin-top: -6px;
+      width: 11px;
+      height: 11px;
+      margin: -5px 0 0 -5px;
       border-radius: 50%;
-      background: #0f172a;
+      background: var(--accent);
       border: 2px solid #fff;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
-      transition: left 0.45s ease, top 0.45s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      transition: left 0.4s ease, top 0.4s ease;
     }
 
-    .note-small {
-      font-size: 11px;
+    .phase-cap {
+      font-size: 10px;
       color: var(--muted);
-      margin-top: 12px;
-      line-height: 1.4;
+      margin-top: 10px;
     }
 
-    .card.span-full {
-      grid-column: 1 / -1;
+    .explain-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      max-width: 40em;
     }
 
-    .meanings-title {
-      font-size: 13px;
+    .explain-box p {
+      margin: 0 0 12px;
+      font-size: 16px;
+      color: #334155;
+    }
+
+    .explain-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .explain-box code {
+      font-family: ui-monospace, monospace;
+      font-size: 0.95em;
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .examples-scroll {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 4px 4px 14px;
+      margin: 0 -8px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .examples-scroll::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .examples-scroll::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 99px;
+    }
+
+    .ex-card {
+      flex: 0 0 min(300px, 85vw);
+      scroll-snap-align: start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 20px 22px;
+    }
+
+    .ex-tag {
+      display: inline-block;
+      font-size: 10px;
       font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .ex-tag-hot {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .ex-tag-fw {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .ex-tag-base {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .ex-title {
       margin: 0 0 14px;
+      font-size: 16px;
+      font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--text);
     }
 
-    .meanings-body {
-      font-size: 12px;
-      color: #334155;
-      line-height: 1.55;
+    .ex-pred {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
     }
 
-    .meanings-body p {
-      margin: 0 0 12px;
+    .ex-pred.exp { color: var(--red); }
+    .ex-pred.drift { color: var(--amber); }
+    .ex-pred.loop { color: #ca8a04; }
+    .ex-pred.stable { color: var(--green); }
+
+    .ex-reason {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
     }
 
-    .meanings-body p:last-child {
-      margin-bottom: 0;
+    footer {
+      padding: 40px 0 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
     }
 
-    .meanings-body ul {
-      margin: 4px 0 14px;
-      padding-left: 1.2rem;
-    }
-
-    .meanings-body li {
-      margin: 5px 0;
-    }
-
-    .meanings-body .meanings-lead {
+    footer p {
+      margin: 0;
+      font-size: 15px;
       font-weight: 500;
       color: var(--text);
-    }
-
-    .corner-note {
-      position: fixed;
-      bottom: 12px;
-      right: 16px;
-      font-size: 10px;
-      color: var(--muted);
-      line-height: 1.35;
-      text-align: right;
-      max-width: 260px;
-      pointer-events: none;
-      z-index: 40;
-    }
-
-    @media (max-width: 600px) {
-      .corner-note {
-        left: 12px;
-        right: 12px;
-        max-width: none;
-        text-align: left;
-      }
+      max-width: 28em;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
 <body>
-  <svg width="0" height="0" aria-hidden="true">
-    <defs>
-      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#22c55e" />
-        <stop offset="55%" stop-color="#eab308" />
-        <stop offset="100%" stop-color="#ef4444" />
-      </linearGradient>
-    </defs>
-  </svg>
+  <div class="container">
+    <header class="hero">
+      <h1>Predict how AI systems fail — before they do</h1>
+      <p>Failure is not random. It is structural.</p>
+    </header>
 
-  <div class="page-wrap">
-    <div class="app">
-      <aside class="sidebar">
-        <h2>Configuration</h2>
-        <p class="sidebar-title">Agent Settings</p>
+    <section aria-labelledby="prob-h">
+      <div class="section-label">01</div>
+      <h2 id="prob-h">The Problem</h2>
+      <div class="prose">
+        <p>Most AI tools optimize performance.<br /><strong>None explain failure.</strong></p>
+        <p>Agents don't fail randomly —<br />they collapse when complexity exceeds control.</p>
+      </div>
+    </section>
 
-        <div class="field">
-          <label for="toolUsage">Tool Usage</label>
-          <input type="range" id="toolUsage" min="0" max="100" value="50" />
-          <div class="field-hint"><span id="toolVal">50</span> / 100</div>
+    <section aria-labelledby="sol-h">
+      <div class="section-label">02</div>
+      <h2 id="sol-h">The Solution</h2>
+      <p class="solution-lead">A structural failure predictor for AI agents</p>
+    </section>
+
+    <section aria-labelledby="demo-h">
+      <div class="section-label">03</div>
+      <h2 id="demo-h">Demo</h2>
+      <div class="demo-grid">
+        <div class="card">
+          <div class="field">
+            <label for="tool">Tool Usage</label>
+            <input type="range" id="tool" min="0" max="100" value="85" />
+            <div class="hint"><span id="toolVal">85</span> / 100</div>
+          </div>
+          <div class="field">
+            <div class="toggle-line">
+              <span>Memory</span>
+              <label class="sw">
+                <input type="checkbox" id="memory" />
+                <span class="sw-ui"></span>
+              </label>
+            </div>
+            <div class="hint">Off = no accumulation buffer</div>
+          </div>
+          <div class="field">
+            <div class="toggle-line">
+              <span>Reflection</span>
+              <label class="sw">
+                <input type="checkbox" id="reflection" checked />
+                <span class="sw-ui"></span>
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="depth">Depth Limit</label>
+            <select id="depth">
+              <option value="bounded">bounded</option>
+              <option value="unbounded" selected>unbounded</option>
+            </select>
+          </div>
+          <button type="button" class="btn" id="analyze">Analyze</button>
         </div>
+        <div class="card">
+          <div class="out-k">Prediction</div>
+          <p class="out-pred exp" id="pred">→ EXPLOSION</p>
+          <div class="out-k">Onset</div>
+          <p class="out-v" id="onset">→ Early</p>
+          <div class="out-k">Reason</div>
+          <p class="out-v" id="reason">→ Uncontrolled tool recursion</p>
+          <div class="out-k">Causal Path</div>
+          <p class="out-v" id="path">→ Complexity ↑ → Control ↓ → Collapse</p>
+        </div>
+      </div>
+    </section>
 
-        <div class="field">
-          <div class="toggle-row">
-            <span>Memory</span>
-            <label class="switch">
-              <input type="checkbox" id="memory" checked />
-              <span class="switch-slider"></span>
-            </label>
+    <section aria-labelledby="viz-h">
+      <div class="section-label">04</div>
+      <h2 id="viz-h">Visualization</h2>
+      <div class="viz-grid">
+        <div class="card viz-card">
+          <h3>Trajectory (time)</h3>
+          <div class="traj" id="traj">
+            <span class="node c1">Start</span>
+            <span class="arr">→</span>
+            <span class="node c2">Load ↑</span>
+            <span class="arr">→</span>
+            <span class="node c3">Control ↓</span>
+            <span class="arr">→</span>
+            <span class="node c4">Failure</span>
           </div>
         </div>
-
-        <div class="field">
-          <div class="toggle-row">
-            <span>Reflection</span>
-            <label class="switch">
-              <input type="checkbox" id="reflection" checked />
-              <span class="switch-slider"></span>
-            </label>
+        <div class="card viz-card">
+          <h3>Phase Map (space)</h3>
+          <div class="phase-box">
+            <div class="phase-inner">
+              <div class="phase-dot" id="dot"></div>
+            </div>
           </div>
+          <p class="phase-cap">C = tool intensity · S = memory + reflection (control)</p>
         </div>
+      </div>
+    </section>
 
-        <div class="field">
-          <label for="depth">Depth Limit</label>
-          <select class="depth" id="depth" name="depth" aria-label="Depth Limit">
-            <option value="bounded">bounded</option>
-            <option value="unbounded">unbounded</option>
-          </select>
-        </div>
+    <section aria-labelledby="ex-h">
+      <div class="section-label">05</div>
+      <h2 id="ex-h">Real-world agent failures</h2>
+      <div class="examples-scroll" role="list">
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
+          <h3 class="ex-title">OpenClaw-like</h3>
+          <p class="ex-pred exp">→ EXPLOSION</p>
+          <p class="ex-reason">Unbounded tool recursion</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
+          <h3 class="ex-title">Tencent Lobster-like</h3>
+          <p class="ex-pred drift">→ DRIFT</p>
+          <p class="ex-reason">Goal instability</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
+          <h3 class="ex-title">AutoGPT-like</h3>
+          <p class="ex-pred exp">→ EXPLOSION</p>
+          <p class="ex-reason">Tool explosion</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
+          <h3 class="ex-title">BabyAGI-like</h3>
+          <p class="ex-pred exp">→ EXPLOSION</p>
+          <p class="ex-reason">Task recursion</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
+          <h3 class="ex-title">OpenDevin-like</h3>
+          <p class="ex-pred drift">→ DRIFT</p>
+          <p class="ex-reason">Goal drift</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
+          <h3 class="ex-title">MCP-heavy agent</h3>
+          <p class="ex-pred exp">→ EXPLOSION</p>
+          <p class="ex-reason">Connector amplification</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-fw">⚙️ Framework</span>
+          <h3 class="ex-title">LangChain Agent</h3>
+          <p class="ex-pred loop">→ LOOP</p>
+          <p class="ex-reason">No reflection</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-fw">⚙️ Framework</span>
+          <h3 class="ex-title">CAMEL Multi-Agent</h3>
+          <p class="ex-pred exp">→ EXPLOSION</p>
+          <p class="ex-reason">Multi-agent amplification</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-fw">⚙️ Framework</span>
+          <h3 class="ex-title">CrewAI</h3>
+          <p class="ex-pred stable">→ STABLE</p>
+          <p class="ex-reason">Structured workflow</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-fw">⚙️ Framework</span>
+          <h3 class="ex-title">Semantic Kernel Agent</h3>
+          <p class="ex-pred loop">→ LOOP</p>
+          <p class="ex-reason">Planner loop without termination</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-base">🧪 Baseline</span>
+          <h3 class="ex-title">Stable Agent</h3>
+          <p class="ex-pred stable">→ STABLE</p>
+          <p class="ex-reason">Controlled system</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-base">🧪 Baseline</span>
+          <h3 class="ex-title">Memory+Reflection Agent</h3>
+          <p class="ex-pred stable">→ STABLE</p>
+          <p class="ex-reason">Balanced dynamics</p>
+        </article>
+        <article class="ex-card" role="listitem">
+          <span class="ex-tag ex-tag-base">🧪 Baseline</span>
+          <h3 class="ex-title">Single-tool ReAct</h3>
+          <p class="ex-pred stable">→ STABLE</p>
+          <p class="ex-reason">Narrow action space</p>
+        </article>
+      </div>
+    </section>
 
-        <button type="button" class="btn-analyze" id="analyze">Analyze</button>
-      </aside>
+    <section aria-labelledby="how-h">
+      <div class="section-label">06</div>
+      <h2 id="how-h">How it works</h2>
+      <div class="explain-box">
+        <p>We model agent behavior using:</p>
+        <p><code>C</code> = Complexity<br /><code>S</code> = Control</p>
+        <p>Failure occurs when:</p>
+        <p><strong>C grows faster than S can stabilize</strong></p>
+      </div>
+    </section>
 
-      <main class="main">
-        <div class="main-head">
-          <h1>AI Agent Failure Prediction</h1>
-          <p>Parameter-driven assessment with trajectory dynamics and phase-space localization.</p>
-        </div>
-
-        <div class="cards">
-          <section class="card" aria-labelledby="healthTitle">
-            <div class="card-label" id="healthTitle">System Health</div>
-            <div class="health-body">
-              <div class="ring-wrap">
-                <svg viewBox="0 0 120 120" aria-hidden="true">
-                  <circle class="ring-bg" cx="60" cy="60" r="54" />
-                  <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="54" />
-                </svg>
-                <div class="ring-center">
-                  <div class="ring-pct"><span id="stabilityPct">—</span><small>%</small></div>
-                </div>
-              </div>
-              <div class="score-caption">Stability Score (0–100)</div>
-              <div class="status-pill" id="statusPill">—</div>
-            </div>
-          </section>
-
-          <section class="card" aria-labelledby="predTitle">
-            <div class="card-label" id="predTitle">Failure Prediction</div>
-            <div class="paper-k">Prediction</div>
-            <div class="pred-main" id="predMain">→ —</div>
-            <div class="paper-k">Confidence</div>
-            <div class="paper-v">→ Structural</div>
-            <div class="paper-k">Onset</div>
-            <div class="paper-v" id="predOnset">→ —</div>
-            <div class="paper-k">Reason</div>
-            <div class="paper-v reason-box" id="predReason">Run <strong>Analyze</strong>.</div>
-            <div class="paper-k" style="margin-top:12px;">Causal Path</div>
-            <div class="paper-v" id="predPath">→ —</div>
-          </section>
-
-          <section class="card" aria-labelledby="trajTitle">
-            <div class="card-label" id="trajTitle">Trajectory</div>
-            <div class="traj-track">
-              <span class="traj-node n1">Start</span>
-              <span class="traj-arrow">→</span>
-              <span class="traj-node n2">Risk</span>
-              <span class="traj-arrow">→</span>
-              <span class="traj-node n3">Instability</span>
-              <span class="traj-arrow">→</span>
-              <span class="traj-node n4">Failure</span>
-            </div>
-            <p class="note-small">Qualitative failure progression (reference).</p>
-          </section>
-
-          <section class="card span-2" aria-labelledby="animTitle">
-            <div class="card-label" id="animTitle">Trajectory Animation</div>
-            <div class="anim-row" id="animRow" aria-live="polite">
-              <div class="anim-item">
-                <div class="anim-node a1" data-step="0">Start</div>
-              </div>
-              <span class="anim-arrow" data-arr="0">→</span>
-              <div class="anim-item">
-                <div class="anim-node a2" data-step="1">Risk</div>
-              </div>
-              <span class="anim-arrow" data-arr="1">→</span>
-              <div class="anim-item">
-                <div class="anim-node a3" data-step="2">Instability</div>
-              </div>
-              <span class="anim-arrow" data-arr="2">→</span>
-              <div class="anim-item">
-                <div class="anim-node a4" data-step="3">Failure</div>
-              </div>
-            </div>
-            <p class="note-small">Sequential activation on each analysis run (green → yellow → red).</p>
-          </section>
-
-          <section class="card" aria-labelledby="phaseTitle">
-            <div class="card-label" id="phaseTitle">Phase Map</div>
-            <div class="phase-wrap">
-              <div class="phase-legend">
-                <span class="lg-safe">Safe (lower left)</span>
-                <span class="lg-risk">Risk (mid)</span>
-                <span class="lg-fail">Failure (upper right)</span>
-              </div>
-              <div class="phase-box" id="phaseBox" aria-label="Phase diagram">
-                <span class="phase-axis s-top">Control (S)</span>
-                <span class="phase-axis c-left">0</span>
-                <span class="phase-axis c-right">C</span>
-                <span class="phase-axis s-bot" style="left:auto;right:8px;bottom:6px;">1</span>
-                <div class="phase-inner">
-                  <div class="phase-dot" id="phaseDot" style="left:50%;top:50%;"></div>
-                </div>
-              </div>
-              <p class="note-small">Axes: horizontal Complexity <em>C</em> = Tool Usage / 100; vertical Control <em>S</em> = Memory/Reflection contribution. Marker: <code style="font-size:10px;">left = C</code>, <code style="font-size:10px;">top = (1 − S)·100%</code>.</p>
-            </div>
-          </section>
-
-          <section class="card span-full" aria-labelledby="meaningsTitle">
-            <h2 class="meanings-title" id="meaningsTitle">What This Means</h2>
-            <div class="meanings-body">
-              <p class="meanings-lead">This system predicts how an AI agent will fail based on structural signals.</p>
-              <p class="meanings-lead" style="margin-bottom:6px;">Key factors:</p>
-              <ul>
-                <li>Tool Usage increases complexity</li>
-                <li>Memory reduces accumulation</li>
-                <li>Reflection stabilizes control</li>
-                <li>Depth Limit prevents runaway recursion</li>
-              </ul>
-              <p class="meanings-lead" style="margin-bottom:6px;">Failure occurs when:</p>
-              <p>Complexity increases faster than control can recover.</p>
-              <p class="meanings-lead" style="margin-bottom:6px;">Typical pattern:</p>
-              <p>Start → Complexity ↑ → Control ↓ → Failure</p>
-            </div>
-          </section>
-        </div>
-      </main>
-    </div>
+    <footer>
+      <p>This is not a monitoring tool.<br />This is a failure predictor.</p>
+    </footer>
   </div>
-
-  <p class="corner-note">Based on structural dynamics modeling (C/E/S framework)</p>
 
   <script>
     (function () {
-      var CIRC = 2 * Math.PI * 54;
-      var animTimers = [];
-
-      function $(id) { return document.getElementById(id); }
-
-      function clamp(n, a, b) {
-        return Math.max(a, Math.min(b, n));
+      function $(id) {
+        return document.getElementById(id);
       }
 
-      function setRingPercent(pct) {
-        var ring = $("ringFg");
-        var off = CIRC * (1 - pct / 100);
-        ring.style.strokeDasharray = String(CIRC);
-        ring.style.strokeDashoffset = String(off);
-      }
-
-      function computeCS(M, R, T) {
-        var C = T / 100;
-        var S = (M ? 0.5 : 0) + (R ? 0.5 : 0);
-        return { C: C, S: S };
-      }
-
-      function computeStabilityScore(M, R, T) {
-        var o = computeCS(M, R, T);
-        var raw = o.S * 100 - o.C * 50;
-        return Math.round(clamp(raw, 0, 100));
-      }
-
-      function bandFromScore(s) {
-        if (s >= 70) return "HIGH";
-        if (s >= 40) return "MEDIUM";
-        return "LOW";
-      }
-
-      function predict(T, M, R, D) {
+      function compute(T, M, R, D) {
         if (T > 70 && D === "unbounded" && !M) {
           return {
             type: "EXPLOSION",
+            cls: "out-pred exp",
             onset: "Early",
             reason: "Uncontrolled tool recursion",
-            path: "Complexity ↑ → Control ↓ → Collapse"
+            path: "Complexity ↑ → Control ↓ → Collapse",
+            traj: ["Start", "Load ↑", "Control ↓", "Failure"],
+            trajDanger: true
           };
         }
         if (!R && !M) {
           return {
             type: "LOOP",
+            cls: "out-pred loop",
             onset: "Mid",
             reason: "No reflection leads to repetition",
-            path: "Execution ↑ → Termination ↓ → Loop"
+            path: "Execution ↑ → Termination ↓ → Loop",
+            traj: ["Start", "Repeat", "Stall", "Loop"],
+            trajDanger: true
           };
         }
         if (T < 40 && M) {
           return {
             type: "STABLE",
+            cls: "out-pred ok",
             onset: "-",
             reason: "System controlled",
-            path: "Bounded operation → Sustained control → Equilibrium"
+            path: "Bounded operation → Sustained control → Equilibrium",
+            traj: ["Start", "Balance", "Hold", "Stable"],
+            trajDanger: false
           };
         }
         return {
           type: "DRIFT",
+          cls: "out-pred drift",
           onset: "Late",
           reason: "Goal instability",
-          path: "Objective noise ↑ → Coupling loss → Drift"
+          path: "Objective noise ↑ → Coupling loss → Drift",
+          traj: ["Start", "Skew", "Drift", "Misalign"],
+          trajDanger: true
         };
       }
 
-      function predClass(type) {
-        if (type === "STABLE") return "pred-main safe";
-        if (type === "DRIFT" || type === "LOOP") return "pred-main warn";
-        return "pred-main danger";
-      }
-
-      function statusClass(band) {
-        if (band === "HIGH") return "status-pill high";
-        if (band === "MEDIUM") return "status-pill medium";
-        return "status-pill low";
-      }
-
-      function clearAnimTimers() {
-        for (var i = 0; i < animTimers.length; i++) {
-          clearTimeout(animTimers[i]);
-        }
-        animTimers = [];
-      }
-
-      function playTrajectoryAnim() {
-        clearAnimTimers();
-        var nodes = document.querySelectorAll(".anim-node");
-        var arrows = document.querySelectorAll(".anim-arrow");
-        for (var i = 0; i < nodes.length; i++) {
-          nodes[i].classList.remove("active", "past");
-        }
-        for (var a = 0; a < arrows.length; a++) {
-          arrows[a].classList.remove("lit");
-        }
-
-        function step(idx) {
-          if (idx > 0) {
-            nodes[idx - 1].classList.remove("active");
-            nodes[idx - 1].classList.add("past");
-            if (idx - 1 < arrows.length) {
-              arrows[idx - 1].classList.add("lit");
-            }
+      function renderTraj(labels, danger) {
+        var t = $("traj");
+        t.innerHTML = "";
+        var classes = danger
+          ? ["c1", "c2", "c3", "c4"]
+          : ["c1", "c2", "c3", "ok4"];
+        for (var i = 0; i < labels.length; i++) {
+          if (i > 0) {
+            var a = document.createElement("span");
+            a.className = "arr";
+            a.textContent = "→";
+            t.appendChild(a);
           }
-          if (idx < nodes.length) {
-            nodes[idx].classList.add("active");
-            animTimers.push(setTimeout(function () { step(idx + 1); }, 420));
-          } else {
-            animTimers.push(setTimeout(function () {
-              for (var j = 0; j < nodes.length; j++) {
-                nodes[j].classList.remove("active");
-                nodes[j].classList.add("past");
-              }
-              for (var k = 0; k < arrows.length; k++) {
-                arrows[k].classList.add("lit");
-              }
-            }, 200));
-          }
+          var n = document.createElement("span");
+          n.className = "node " + classes[i];
+          n.textContent = labels[i];
+          t.appendChild(n);
         }
-
-        animTimers.push(setTimeout(function () { step(0); }, 80));
       }
 
-      function updatePhaseDot(M, R, T) {
-        var o = computeCS(M, R, T);
-        var x = o.C * 100;
-        var y = (1 - o.S) * 100;
-        var dot = $("phaseDot");
-        dot.style.left = x + "%";
-        dot.style.top = y + "%";
+      function phaseDot(T, M, R) {
+        var C = T / 100;
+        var S = (M ? 0.5 : 0) + (R ? 0.5 : 0);
+        $("dot").style.left = C * 100 + "%";
+        $("dot").style.top = (1 - S) * 100 + "%";
       }
 
-      function runAnalyze() {
-        var T = parseInt($("toolUsage").value, 10);
+      function run() {
+        var T = parseInt($("tool").value, 10);
         var M = $("memory").checked;
         var R = $("reflection").checked;
         var D = $("depth").value;
+        var o = compute(T, M, R, D);
 
-        var score = computeStabilityScore(M, R, T);
-        var band = bandFromScore(score);
-        var p = predict(T, M, R, D);
-
-        $("stabilityPct").textContent = String(score);
-        setRingPercent(score);
-
-        var pill = $("statusPill");
-        pill.textContent = band;
-        pill.className = statusClass(band);
-
-        var pm = $("predMain");
-        pm.textContent = "→ " + p.type;
-        pm.className = predClass(p.type);
-
-        $("predOnset").textContent = "→ " + p.onset;
-        $("predReason").textContent = "→ " + p.reason;
-        $("predPath").textContent = "→ " + p.path;
-
-        updatePhaseDot(M, R, T);
-        playTrajectoryAnim();
+        $("pred").textContent = "→ " + o.type;
+        $("pred").className = o.cls;
+        $("onset").textContent = "→ " + o.onset;
+        $("reason").textContent = "→ " + o.reason;
+        $("path").textContent = "→ " + o.path;
+        renderTraj(o.traj, o.trajDanger);
+        phaseDot(T, M, R);
       }
 
-      $("toolUsage").addEventListener("input", function () {
+      $("tool").addEventListener("input", function () {
         $("toolVal").textContent = this.value;
       });
-
-      $("analyze").addEventListener("click", runAnalyze);
-
-      $("toolVal").textContent = $("toolUsage").value;
-      setRingPercent(0);
+      $("analyze").addEventListener("click", run);
+      $("toolVal").textContent = $("tool").value;
+      run();
     })();
   </script>
 </body>
