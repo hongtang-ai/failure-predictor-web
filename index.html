@@ -3,215 +3,674 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent Failure Predictor</title>
+  <title>AI Agent Failure Prediction</title>
   <style>
-    * { box-sizing: border-box; }
+    :root {
+      --bg-1: #f0f2f5;
+      --bg-2: #e8ecf1;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: rgba(15, 23, 42, 0.08);
+      --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.08);
+      --shadow-hover: 0 4px 12px rgba(15, 23, 42, 0.08), 0 16px 40px rgba(15, 23, 42, 0.12);
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --yellow: #ca8a04;
+      --yellow-soft: #fef9c3;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --accent-start: #22c55e;
+      --accent-end: #15803d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 2rem 1.25rem;
+      font-family: Arial, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 45%, #eef1f6 100%);
       line-height: 1.5;
-      color: #111;
-      background: #fafafa;
+      -webkit-font-smoothing: antialiased;
     }
-    h1 {
-      font-size: 1.5rem;
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(280px, 340px) 1fr;
+      min-height: 100vh;
+      gap: 0;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sidebar {
+      padding: 28px 24px 32px;
+      border-right: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(12px);
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+
+    .sidebar h2 {
+      margin: 0 0 8px;
+      font-size: 13px;
       font-weight: 700;
-      margin: 0 0 1.5rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .sidebar-title {
+      margin: 0 0 24px;
+      font-size: 22px;
+      font-weight: 700;
       letter-spacing: -0.02em;
+      color: var(--text);
     }
-    .inputs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem 1.5rem;
-      align-items: flex-end;
-      margin-bottom: 1.5rem;
+
+    .field {
+      margin-bottom: 22px;
     }
-    .field label {
+
+    .field > label {
       display: block;
-      font-size: 0.8rem;
-      color: #444;
-      margin-bottom: 0.35rem;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
     }
-    select {
-      min-width: 10rem;
-      padding: 0.45rem 0.6rem;
-      font-size: 0.95rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+
+    .field-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--green-soft), var(--yellow-soft), var(--red-soft));
+      appearance: none;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
       background: #fff;
-    }
-    button {
-      padding: 0.5rem 1rem;
-      font-size: 0.95rem;
-      border: 1px solid #333;
-      border-radius: 6px;
-      background: #111;
-      color: #fff;
+      border: 2px solid var(--text);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
       cursor: pointer;
     }
-    button:hover { background: #333; }
-    .output {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1.25rem 1.25rem 1rem;
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
       background: #fff;
+      border: 2px solid var(--text);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+      cursor: pointer;
     }
-    .block {
-      margin-bottom: 1.25rem;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid #eee;
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
-    .block:last-child {
-      margin-bottom: 0;
-      padding-bottom: 0;
-      border-bottom: none;
+
+    .toggle-row span {
+      font-size: 14px;
+      font-weight: 500;
     }
-    .block h2 {
-      font-size: 0.75rem;
+
+    .switch {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      inset: 0;
+      background: #e2e8f0;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .switch-slider::before {
+      content: "";
+      position: absolute;
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .switch input:checked + .switch-slider {
+      background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+    }
+
+    .switch input:checked + .switch-slider::before {
+      transform: translateX(20px);
+    }
+
+    select.depth {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .btn-analyze {
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px 20px;
+      font-size: 15px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #666;
-      margin: 0 0 0.5rem;
+      font-family: inherit;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #34d399 0%, var(--accent-start) 40%, var(--accent-end) 100%);
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
     }
-    .prediction-value {
-      font-size: 2rem;
+
+    .btn-analyze:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(22, 163, 74, 0.45);
+    }
+
+    .btn-analyze:active {
+      transform: translateY(0);
+    }
+
+    .main {
+      padding: 28px 28px 40px;
+      overflow-x: hidden;
+    }
+
+    @media (min-width: 901px) {
+      .main {
+        padding: 36px 40px 48px;
+      }
+    }
+
+    .main-head {
+      margin-bottom: 28px;
+    }
+
+    .main-head h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 30px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .main-head p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 1100px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      min-height: 200px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .card-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .card-label .emoji {
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .health-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+    }
+
+    .ring-wrap svg {
+      transform: rotate(-90deg);
+      width: 140px;
+      height: 140px;
+    }
+
+    .ring-bg {
+      fill: none;
+      stroke: #e2e8f0;
+      stroke-width: 10;
+    }
+
+    .ring-fg {
+      fill: none;
+      stroke: url(#ringGrad);
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 339.292;
+      stroke-dashoffset: 339.292;
+      transition: stroke-dashoffset 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .ring-pct {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .ring-pct small {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .status-pill.high {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .status-pill.medium {
+      background: var(--yellow-soft);
+      color: #a16207;
+    }
+
+    .status-pill.low {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .pred-type {
+      font-size: clamp(28px, 5vw, 36px);
       font-weight: 800;
       letter-spacing: -0.03em;
-      margin: 0;
+      margin: 0 0 12px;
+      line-height: 1.15;
     }
-    .lines {
-      margin: 0;
-      padding-left: 0;
-      list-style: none;
+
+    .pred-type.danger {
+      color: var(--red);
     }
-    .lines li {
-      margin: 0.25rem 0;
-      padding-left: 0;
+
+    .pred-type.safe {
+      color: var(--green);
+    }
+
+    .pred-type.warn {
+      color: #b45309;
+    }
+
+    .meta-row {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .meta-row strong {
+      color: var(--muted);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .reason {
+      margin: 16px 0 0;
+      padding: 14px 16px;
+      font-size: 14px;
+      color: var(--text);
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .traj-track {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px 4px;
+      margin-top: 8px;
+    }
+
+    .traj-node {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .traj-node.n1 {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+    }
+
+    .traj-node.n2 {
+      background: linear-gradient(135deg, #84cc16, #ca8a04);
+    }
+
+    .traj-node.n3 {
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+    }
+
+    .traj-node.n4 {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+
+    .traj-arrow {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 0 2px;
     }
   </style>
 </head>
 <body>
-  <h1>Agent Failure Predictor</h1>
+  <svg width="0" height="0" aria-hidden="true">
+    <defs>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#22c55e" />
+        <stop offset="50%" stop-color="#eab308" />
+        <stop offset="100%" stop-color="#ef4444" />
+      </linearGradient>
+    </defs>
+  </svg>
 
-  <div class="inputs">
-    <div class="field">
-      <label for="tool">Tool Usage</label>
-      <select id="tool" aria-label="Tool Usage">
-        <option value="low">low</option>
-        <option value="high">high</option>
-      </select>
-    </div>
-    <div class="field">
-      <label for="goal">Goal Stability</label>
-      <select id="goal" aria-label="Goal Stability">
-        <option value="stable">stable</option>
-        <option value="unstable">unstable</option>
-      </select>
-    </div>
-    <button type="button" id="predictBtn">Predict</button>
-  </div>
+  <div class="app">
+    <aside class="sidebar">
+      <h2>Configuration</h2>
+      <p class="sidebar-title">Agent Settings</p>
 
-  <div class="output" id="output">
-    <div class="block">
-      <h2>Prediction</h2>
-      <p class="prediction-value" id="predictionText">→ STABLE</p>
-    </div>
-    <div class="block">
-      <h2>Why</h2>
-      <ul class="lines" id="whyLines"></ul>
-    </div>
-    <div class="block">
-      <h2>Path</h2>
-      <ul class="lines" id="pathLines"></ul>
-    </div>
-    <div class="block">
-      <h2>Stages</h2>
-      <ul class="lines" id="stageLines"></ul>
-    </div>
+      <div class="field">
+        <label for="toolUsage">Tool Usage</label>
+        <input type="range" id="toolUsage" min="0" max="100" value="50" />
+        <div class="field-hint"><span id="toolVal">50</span> / 100</div>
+      </div>
+
+      <div class="field">
+        <div class="toggle-row">
+          <span>Memory</span>
+          <label class="switch" title="Memory">
+            <input type="checkbox" id="memory" checked />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="toggle-row">
+          <span>Reflection</span>
+          <label class="switch" title="Reflection">
+            <input type="checkbox" id="reflection" checked />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="depth">Depth Limit</label>
+        <select class="depth" id="depth">
+          <option value="bounded">Bounded</option>
+          <option value="unbounded">Unbounded</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn-analyze" id="analyze">Analyze</button>
+    </aside>
+
+    <main class="main">
+      <div class="main-head">
+        <h1>AI Agent Failure Prediction</h1>
+        <p>Configure agent parameters and run analysis to assess system health and failure trajectory.</p>
+      </div>
+
+      <div class="cards">
+        <section class="card" aria-labelledby="healthTitle">
+          <div class="card-label" id="healthTitle"><span class="emoji" aria-hidden="true">1️⃣</span> System Health</div>
+          <div class="health-body">
+            <div class="ring-wrap">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="ring-bg" cx="60" cy="60" r="54" />
+                <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="54" />
+              </svg>
+              <div class="ring-center">
+                <div class="ring-pct"><span id="stabilityPct">—</span><small>%</small></div>
+              </div>
+            </div>
+            <div>
+              <div class="field-hint" style="text-align:center;margin:0 0 8px;">Stability</div>
+              <div class="status-pill" id="statusPill">—</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="predTitle">
+          <div class="card-label" id="predTitle"><span class="emoji" aria-hidden="true">2️⃣</span> Failure Prediction</div>
+          <p class="pred-type" id="predType">—</p>
+          <div class="meta-row"><strong>Onset</strong><span id="predOnset">—</span></div>
+          <div class="meta-row"><strong>Reason</strong></div>
+          <p class="reason" id="predReason">Click <strong>Analyze</strong> to generate a prediction.</p>
+        </section>
+
+        <section class="card" aria-labelledby="trajTitle">
+          <div class="card-label" id="trajTitle"><span class="emoji" aria-hidden="true">3️⃣</span> Trajectory</div>
+          <div class="traj-track" id="trajTrack">
+            <span class="traj-node n1">Start</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-node n2">Risk</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-node n3">Instability</span>
+            <span class="traj-arrow">→</span>
+            <span class="traj-node n4">Failure</span>
+          </div>
+          <p class="field-hint" style="margin-top:16px;">Gradient indicates progression from stable operation toward failure modes.</p>
+        </section>
+      </div>
+    </main>
   </div>
 
   <script>
-    function getOutcome(tool, goal) {
-      if (tool === "high" && goal === "unstable") {
-        return {
-          prediction: "EXPLOSION",
-          why: "Uncontrolled tool usage + unstable goal",
-          path: "Start → Complexity ↑ → Control ↓ → Explosion",
-          stages: [
-            "Stable",
-            "Risk Increasing",
-            "Loss of Control",
-            "Explosion"
-          ]
-        };
-      }
-      if (tool === "low" && goal === "unstable") {
-        return {
-          prediction: "DRIFT",
-          why: "Goal inconsistency",
-          path: "Start → Divergence → Drift",
-          stages: [
-            "Stable",
-            "Slight deviation",
-            "Goal divergence",
-            "Drift"
-          ]
-        };
-      }
-      if (tool === "high" && goal === "stable") {
-        return {
-          prediction: "LOOP",
-          why: "Repeated execution without termination",
-          path: "Start → Repeat → Repeat → Loop",
-          stages: [
-            "Stable",
-            "Repetition",
-            "Redundancy",
-            "Loop"
-          ]
-        };
-      }
-      return {
-        prediction: "STABLE",
-        why: "Controlled system",
-        path: "Stable trajectory",
-        stages: ["Stable", "Stable", "Stable", "Stable"]
-      };
-    }
+    (function () {
+      var CIRC = 2 * Math.PI * 54;
 
-    function render() {
-      var tool = document.getElementById("tool").value;
-      var goal = document.getElementById("goal").value;
-      var o = getOutcome(tool, goal);
+      function $(id) {
+        return document.getElementById(id);
+      }
 
-      document.getElementById("predictionText").textContent = "→ " + o.prediction;
+      function setRingPercent(pct) {
+        var ring = $("ringFg");
+        var off = CIRC * (1 - pct / 100);
+        ring.style.strokeDasharray = String(CIRC);
+        ring.style.strokeDashoffset = String(off);
+      }
 
-      function setList(id, items) {
-        var ul = document.getElementById(id);
-        ul.innerHTML = "";
-        for (var i = 0; i < items.length; i++) {
-          var li = document.createElement("li");
-          li.textContent = "→ " + items[i];
-          ul.appendChild(li);
+      function computeStability(T, M, R, D) {
+        var s = 58;
+        s += (100 - T) * 0.32;
+        if (M) s += 14;
+        if (R) s += 10;
+        if (D === "bounded") s += 8;
+        if (D === "unbounded") s -= 10;
+        s = Math.round(Math.max(9, Math.min(97, s)));
+        var band = s >= 68 ? "HIGH" : s >= 42 ? "MEDIUM" : "LOW";
+        return { pct: s, band: band };
+      }
+
+      function predict(T, M, R, D) {
+        if (T > 70 && D === "unbounded" && !M) {
+          return {
+            type: "EXPLOSION",
+            onset: "Early Stage",
+            reason: "Uncontrolled tool recursion without memory"
+          };
         }
+        if (!R && !M) {
+          return {
+            type: "LOOP",
+            onset: "Mid Stage",
+            reason: "Lack of reflection leads to repeated execution"
+          };
+        }
+        if (T < 40 && M) {
+          return {
+            type: "STABLE",
+            onset: "-",
+            reason: "System remains controlled"
+          };
+        }
+        return {
+          type: "DRIFT",
+          onset: "Late Stage",
+          reason: "Goal instability over time"
+        };
       }
 
-      setList("whyLines", [o.why]);
-      setList("pathLines", [o.path]);
-      var stageItems = [];
-      for (var s = 0; s < o.stages.length; s++) {
-        stageItems.push("Stage " + (s + 1) + ": " + o.stages[s]);
+      function predClass(type) {
+        if (type === "STABLE") return "pred-type safe";
+        if (type === "DRIFT" || type === "LOOP") return "pred-type warn";
+        return "pred-type danger";
       }
-      setList("stageLines", stageItems);
-    }
 
-    document.getElementById("predictBtn").addEventListener("click", render);
-    document.getElementById("tool").addEventListener("change", render);
-    document.getElementById("goal").addEventListener("change", render);
-    render();
+      function statusClass(band) {
+        if (band === "HIGH") return "status-pill high";
+        if (band === "MEDIUM") return "status-pill medium";
+        return "status-pill low";
+      }
+
+      function runAnalyze() {
+        var T = parseInt($("toolUsage").value, 10);
+        var M = $("memory").checked;
+        var R = $("reflection").checked;
+        var D = $("depth").value;
+
+        var health = computeStability(T, M, R, D);
+        var p = predict(T, M, R, D);
+
+        $("stabilityPct").textContent = String(health.pct);
+        setRingPercent(health.pct);
+
+        var pill = $("statusPill");
+        pill.textContent = health.band;
+        pill.className = statusClass(health.band);
+
+        var pt = $("predType");
+        pt.textContent = p.type;
+        pt.className = predClass(p.type);
+
+        $("predOnset").textContent = p.onset;
+        $("predReason").textContent = p.reason;
+      }
+
+      $("toolUsage").addEventListener("input", function () {
+        $("toolVal").textContent = this.value;
+      });
+
+      $("analyze").addEventListener("click", runAnalyze);
+
+      $("toolVal").textContent = $("toolUsage").value;
+      setRingPercent(0);
+    })();
   </script>
 </body>
 </html>
