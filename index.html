@@ -1,46 +1,217 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Agent Failure Predictor</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem;
+      line-height: 1.5;
+      color: #111;
+      background: #fafafa;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 1.5rem;
+      letter-spacing: -0.02em;
+    }
+    .inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 1.5rem;
+      align-items: flex-end;
+      margin-bottom: 1.5rem;
+    }
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      color: #444;
+      margin-bottom: 0.35rem;
+    }
+    select {
+      min-width: 10rem;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 0.95rem;
+      border: 1px solid #333;
+      border-radius: 6px;
+      background: #111;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover { background: #333; }
+    .output {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.25rem 1.25rem 1rem;
+      background: #fff;
+    }
+    .block {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid #eee;
+    }
+    .block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .block h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #666;
+      margin: 0 0 0.5rem;
+    }
+    .prediction-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+    .lines {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+    }
+    .lines li {
+      margin: 0.25rem 0;
+      padding-left: 0;
+    }
+  </style>
 </head>
-<body style="font-family: Arial; padding: 40px;">
+<body>
+  <h1>Agent Failure Predictor</h1>
 
-<h2>Will Your Agent Fail?</h2>
+  <div class="inputs">
+    <div class="field">
+      <label for="tool">Tool Usage</label>
+      <select id="tool" aria-label="Tool Usage">
+        <option value="low">low</option>
+        <option value="high">high</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="goal">Goal Stability</label>
+      <select id="goal" aria-label="Goal Stability">
+        <option value="stable">stable</option>
+        <option value="unstable">unstable</option>
+      </select>
+    </div>
+    <button type="button" id="predictBtn">Predict</button>
+  </div>
 
-<label>Tool Usage:</label>
-<select id="tool">
-  <option value="low">Low</option>
-  <option value="high">High</option>
-</select>
+  <div class="output" id="output">
+    <div class="block">
+      <h2>Prediction</h2>
+      <p class="prediction-value" id="predictionText">→ STABLE</p>
+    </div>
+    <div class="block">
+      <h2>Why</h2>
+      <ul class="lines" id="whyLines"></ul>
+    </div>
+    <div class="block">
+      <h2>Path</h2>
+      <ul class="lines" id="pathLines"></ul>
+    </div>
+    <div class="block">
+      <h2>Stages</h2>
+      <ul class="lines" id="stageLines"></ul>
+    </div>
+  </div>
 
-<br><br>
+  <script>
+    function getOutcome(tool, goal) {
+      if (tool === "high" && goal === "unstable") {
+        return {
+          prediction: "EXPLOSION",
+          why: "Uncontrolled tool usage + unstable goal",
+          path: "Start → Complexity ↑ → Control ↓ → Explosion",
+          stages: [
+            "Stable",
+            "Risk Increasing",
+            "Loss of Control",
+            "Explosion"
+          ]
+        };
+      }
+      if (tool === "low" && goal === "unstable") {
+        return {
+          prediction: "DRIFT",
+          why: "Goal inconsistency",
+          path: "Start → Divergence → Drift",
+          stages: [
+            "Stable",
+            "Slight deviation",
+            "Goal divergence",
+            "Drift"
+          ]
+        };
+      }
+      if (tool === "high" && goal === "stable") {
+        return {
+          prediction: "LOOP",
+          why: "Repeated execution without termination",
+          path: "Start → Repeat → Repeat → Loop",
+          stages: [
+            "Stable",
+            "Repetition",
+            "Redundancy",
+            "Loop"
+          ]
+        };
+      }
+      return {
+        prediction: "STABLE",
+        why: "Controlled system",
+        path: "Stable trajectory",
+        stages: ["Stable", "Stable", "Stable", "Stable"]
+      };
+    }
 
-<label>Goal Stability:</label>
-<select id="goal">
-  <option value="stable">Stable</option>
-  <option value="unstable">Unstable</option>
-</select>
+    function render() {
+      var tool = document.getElementById("tool").value;
+      var goal = document.getElementById("goal").value;
+      var o = getOutcome(tool, goal);
 
-<br><br>
+      document.getElementById("predictionText").textContent = "→ " + o.prediction;
 
-<button onclick="predict()">Predict</button>
+      function setList(id, items) {
+        var ul = document.getElementById(id);
+        ul.innerHTML = "";
+        for (var i = 0; i < items.length; i++) {
+          var li = document.createElement("li");
+          li.textContent = "→ " + items[i];
+          ul.appendChild(li);
+        }
+      }
 
-<h3 id="result"></h3>
+      setList("whyLines", [o.why]);
+      setList("pathLines", [o.path]);
+      var stageItems = [];
+      for (var s = 0; s < o.stages.length; s++) {
+        stageItems.push("Stage " + (s + 1) + ": " + o.stages[s]);
+      }
+      setList("stageLines", stageItems);
+    }
 
-<script>
-function predict() {
-  let tool = document.getElementById("tool").value;
-  let goal = document.getElementById("goal").value;
-
-  if (tool === "high" && goal === "unstable") {
-    document.getElementById("result").innerText =
-      "Prediction: EXPLOSION → Uncontrolled tool usage";
-  } else {
-    document.getElementById("result").innerText =
-      "Prediction: STABLE";
-  }
-}
-</script>
-
+    document.getElementById("predictBtn").addEventListener("click", render);
+    document.getElementById("tool").addEventListener("change", render);
+    document.getElementById("goal").addEventListener("change", render);
+    render();
+  </script>
 </body>
 </html>
