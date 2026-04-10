@@ -214,7 +214,7 @@
     }
 
     .main {
-      padding: 24px 22px 32px;
+      padding: 24px 22px max(48px, calc(2.5rem + env(safe-area-inset-bottom, 0px)));
       overflow-x: hidden;
     }
 
@@ -562,6 +562,68 @@
       margin-top: 12px;
       line-height: 1.4;
     }
+
+    .card.span-full {
+      grid-column: 1 / -1;
+    }
+
+    .meanings-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin: 0 0 14px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .meanings-body {
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.55;
+    }
+
+    .meanings-body p {
+      margin: 0 0 12px;
+    }
+
+    .meanings-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .meanings-body ul {
+      margin: 4px 0 14px;
+      padding-left: 1.2rem;
+    }
+
+    .meanings-body li {
+      margin: 5px 0;
+    }
+
+    .meanings-body .meanings-lead {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .corner-note {
+      position: fixed;
+      bottom: 12px;
+      right: 16px;
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.35;
+      text-align: right;
+      max-width: 260px;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    @media (max-width: 600px) {
+      .corner-note {
+        left: 12px;
+        right: 12px;
+        max-width: none;
+        text-align: left;
+      }
+    }
   </style>
 </head>
 <body>
@@ -609,9 +671,9 @@
 
         <div class="field">
           <label for="depth">Depth Limit</label>
-          <select class="depth" id="depth">
-            <option value="bounded">Bounded</option>
-            <option value="unbounded">Unbounded</option>
+          <select class="depth" id="depth" name="depth" aria-label="Depth Limit">
+            <option value="bounded">bounded</option>
+            <option value="unbounded">unbounded</option>
           </select>
         </div>
 
@@ -646,6 +708,8 @@
             <div class="card-label" id="predTitle">Failure Prediction</div>
             <div class="paper-k">Prediction</div>
             <div class="pred-main" id="predMain">→ —</div>
+            <div class="paper-k">Confidence</div>
+            <div class="paper-v">→ Structural</div>
             <div class="paper-k">Onset</div>
             <div class="paper-v" id="predOnset">→ —</div>
             <div class="paper-k">Reason</div>
@@ -710,10 +774,30 @@
               <p class="note-small">Axes: horizontal Complexity <em>C</em> = Tool Usage / 100; vertical Control <em>S</em> = Memory/Reflection contribution. Marker: <code style="font-size:10px;">left = C</code>, <code style="font-size:10px;">top = (1 − S)·100%</code>.</p>
             </div>
           </section>
+
+          <section class="card span-full" aria-labelledby="meaningsTitle">
+            <h2 class="meanings-title" id="meaningsTitle">What This Means</h2>
+            <div class="meanings-body">
+              <p class="meanings-lead">This system predicts how an AI agent will fail based on structural signals.</p>
+              <p class="meanings-lead" style="margin-bottom:6px;">Key factors:</p>
+              <ul>
+                <li>Tool Usage increases complexity</li>
+                <li>Memory reduces accumulation</li>
+                <li>Reflection stabilizes control</li>
+                <li>Depth Limit prevents runaway recursion</li>
+              </ul>
+              <p class="meanings-lead" style="margin-bottom:6px;">Failure occurs when:</p>
+              <p>Complexity increases faster than control can recover.</p>
+              <p class="meanings-lead" style="margin-bottom:6px;">Typical pattern:</p>
+              <p>Start → Complexity ↑ → Control ↓ → Failure</p>
+            </div>
+          </section>
         </div>
       </main>
     </div>
   </div>
+
+  <p class="corner-note">Based on structural dynamics modeling (C/E/S framework)</p>
 
   <script>
     (function () {
