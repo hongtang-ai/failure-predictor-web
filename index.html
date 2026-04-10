@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Agent Failure Predictor</title>
+</head>
+<body style="font-family: Arial; padding: 40px;">
+
+<h2>Will Your Agent Fail?</h2>
+
+<label>Tool Usage:</label>
+<select id="tool">
+  <option value="low">Low</option>
+  <option value="high">High</option>
+</select>
+
+<br><br>
+
+<label>Goal Stability:</label>
+<select id="goal">
+  <option value="stable">Stable</option>
+  <option value="unstable">Unstable</option>
+</select>
+
+<br><br>
+
+<button onclick="predict()">Predict</button>
+
+<h3 id="result"></h3>
+
+<script>
+function predict() {
+  let tool = document.getElementById("tool").value;
+  let goal = document.getElementById("goal").value;
+
+  if (tool === "high" && goal === "unstable") {
+    document.getElementById("result").innerText =
+      "Prediction: EXPLOSION → Uncontrolled tool usage";
+  } else {
+    document.getElementById("result").innerText =
+      "Prediction: STABLE";
+  }
+}
+</script>
+
+</body>
+</html>
