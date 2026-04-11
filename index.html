@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Structural Failure Predictor — AI Agents</title>
+  <title>Agent Failure Predictor</title>
   <style>
     :root {
       --bg: #ffffff;
@@ -13,799 +13,264 @@
       --border: #e2e8f0;
       --accent: #0f172a;
       --red: #dc2626;
-      --green: #15803d;
       --amber: #b45309;
+      --green: #15803d;
     }
 
     * { box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
     body {
       margin: 0;
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.55;
-      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
     }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 24px 80px;
-    }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
 
     .hero {
-      padding: 72px 0 56px;
+      padding: 80px 0 60px;
       text-align: center;
       border-bottom: 1px solid var(--border);
     }
 
     .hero h1 {
-      margin: 0 0 16px;
-      font-size: clamp(28px, 5vw, 40px);
+      font-size: clamp(32px, 6vw, 48px);
       font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-      max-width: 16em;
-      margin-left: auto;
-      margin-right: auto;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin: 0 0 16px;
     }
 
     .hero p {
-      margin: 0;
-      font-size: clamp(16px, 2.2vw, 19px);
+      font-size: 20px;
       color: var(--muted);
-      font-weight: 450;
-      max-width: 28em;
-      margin-left: auto;
-      margin-right: auto;
+      max-width: 32em;
+      margin: 0 auto;
     }
 
-    section {
-      padding: 48px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    section:last-of-type {
-      border-bottom: none;
-    }
+    section { padding: 60px 0; border-bottom: 1px solid var(--border); }
 
     .section-label {
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
-    h2 {
-      margin: 0 0 20px;
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+    h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 24px; }
+
+    .failure-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
     }
 
-    .prose {
-      font-size: 16px;
-      color: #334155;
-      max-width: 38em;
-    }
-
-    .prose p {
-      margin: 0 0 14px;
-    }
-
-    .prose p:last-child {
-      margin-bottom: 0;
-    }
-
-    .prose strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .solution-lead {
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--text);
-      margin: 0;
-      max-width: 32em;
-    }
-
-    .card {
-      background: var(--surface);
+    .failure-card {
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 28px;
+      padding: 24px;
+      background: var(--surface);
     }
 
-    .demo-grid {
+    .failure-card h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .exp { color: var(--red); }
+    .drift { color: var(--amber); }
+    .loop { color: #ca8a04; }
+    .stable { color: var(--green); }
+
+    .demo {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      margin: 40px 0;
+    }
+
+    .input-grid {
       display: grid;
-      grid-template-columns: 1fr 1.15fr;
-      gap: 24px;
-      align-items: start;
-    }
-
-    @media (max-width: 720px) {
-      .demo-grid {
-        grid-template-columns: 1fr;
-      }
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
     }
 
     .field {
-      margin-bottom: 18px;
-    }
-
-    .field:last-of-type {
-      margin-bottom: 0;
+      margin-bottom: 20px;
     }
 
     .field label {
       display: block;
-      font-size: 12px;
       font-weight: 600;
-      color: var(--text);
       margin-bottom: 8px;
-    }
-
-    input[type="range"] {
-      width: 100%;
-      height: 4px;
-      border-radius: 99px;
-      background: var(--border);
-      appearance: none;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-      border: 2px solid #fff;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-    }
-
-    .hint {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .toggle-line {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .toggle-line span {
       font-size: 14px;
     }
 
-    .sw {
-      position: relative;
-      width: 44px;
-      height: 26px;
-      flex-shrink: 0;
-    }
-
-    .sw input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .sw-ui {
-      position: absolute;
-      inset: 0;
-      background: #cbd5e1;
-      border-radius: 99px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .sw-ui::before {
-      content: "";
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      left: 3px;
-      top: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.2s;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-    }
-
-    .sw input:checked + .sw-ui {
-      background: var(--accent);
-    }
-
-    .sw input:checked + .sw-ui::before {
-      transform: translateX(18px);
-    }
-
-    select {
+    select, input[type="range"] {
       width: 100%;
       padding: 10px 12px;
-      font-size: 14px;
-      font-family: inherit;
       border: 1px solid var(--border);
       border-radius: 8px;
-      background: #fff;
-      cursor: pointer;
+      font-size: 15px;
     }
 
     .btn {
       width: 100%;
-      margin-top: 20px;
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 600;
-      font-family: inherit;
-      color: #fff;
+      padding: 14px;
       background: var(--accent);
+      color: white;
       border: none;
       border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
+      margin-top: 20px;
     }
 
-    .btn:hover {
-      opacity: 0.92;
-    }
-
-    .out-k {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 4px;
-      margin-top: 16px;
-    }
-
-    .out-k:first-child {
-      margin-top: 0;
-    }
-
-    .out-pred {
-      font-size: clamp(28px, 5vw, 36px);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin: 0;
-      line-height: 1.1;
-    }
-
-    .out-pred.exp { color: var(--red); }
-    .out-pred.loop, .out-pred.drift { color: var(--amber); }
-    .out-pred.ok { color: var(--green); }
-
-    .out-v {
-      font-size: 15px;
-      margin: 0;
-      color: var(--text);
-    }
-
-    .viz-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    @media (max-width: 640px) {
-      .viz-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .viz-card h3 {
-      margin: 0 0 14px;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .traj {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 6px 4px;
-    }
-
-    .traj span.node {
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .traj span.node.c1 { background: #334155; }
-    .traj span.node.c2 { background: #64748b; }
-    .traj span.node.c3 { background: #94a3b8; }
-    .traj span.node.c4 { background: #dc2626; }
-
-    .traj span.node.ok4 { background: #15803d; }
-
-    .traj span.arr {
-      color: var(--muted);
-      font-weight: 600;
-      font-size: 12px;
-    }
-
-    .phase-box {
-      position: relative;
-      aspect-ratio: 1;
-      max-height: 220px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: linear-gradient(to top right, #bbf7d0 0%, #fef08a 50%, #fecaca 100%);
-    }
-
-    .phase-inner {
-      position: absolute;
-      left: 24px;
-      right: 10px;
-      top: 24px;
-      bottom: 24px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 6px;
-    }
-
-    .phase-dot {
-      position: absolute;
-      width: 11px;
-      height: 11px;
-      margin: -5px 0 0 -5px;
-      border-radius: 50%;
-      background: var(--accent);
-      border: 2px solid #fff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-      transition: left 0.4s ease, top 0.4s ease;
-    }
-
-    .phase-cap {
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 10px;
-    }
-
-    .explain-box {
-      background: var(--surface);
+    .result {
+      margin-top: 40px;
+      padding: 32px;
+      background: white;
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 28px 32px;
-      max-width: 40em;
     }
 
-    .explain-box p {
+    .pred {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
       margin: 0 0 12px;
-      font-size: 16px;
-      color: #334155;
     }
 
-    .explain-box p:last-child {
-      margin-bottom: 0;
-    }
-
-    .explain-box code {
-      font-family: ui-monospace, monospace;
-      font-size: 0.95em;
-      background: #fff;
-      padding: 2px 6px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-    }
-
-    .examples-scroll {
-      display: flex;
-      gap: 16px;
-      overflow-x: auto;
-      padding: 4px 4px 14px;
-      margin: 0 -8px;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .examples-scroll::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    .examples-scroll::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 99px;
-    }
-
-    .ex-card {
-      flex: 0 0 min(300px, 85vw);
-      scroll-snap-align: start;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px 20px 22px;
-    }
-
-    .ex-tag {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      padding: 4px 8px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-
-    .ex-tag-hot {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .ex-tag-fw {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-    .ex-tag-base {
-      background: #f1f5f9;
-      color: #475569;
-    }
-
-    .ex-title {
-      margin: 0 0 14px;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text);
-    }
-
-    .ex-pred {
-      margin: 0 0 8px;
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-    }
-
-    .ex-pred.exp { color: var(--red); }
-    .ex-pred.drift { color: var(--amber); }
-    .ex-pred.loop { color: #ca8a04; }
-    .ex-pred.stable { color: var(--green); }
-
-    .ex-reason {
-      margin: 0;
-      font-size: 13px;
+    .confidence {
+      font-size: 15px;
       color: var(--muted);
-      line-height: 1.45;
     }
 
     footer {
-      padding: 40px 0 0;
       text-align: center;
-      border-top: 1px solid var(--border);
-      margin-top: 8px;
-    }
-
-    footer p {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text);
-      max-width: 28em;
-      margin-left: auto;
-      margin-right: auto;
+      padding: 60px 0 40px;
+      color: var(--muted);
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="container">
+
     <header class="hero">
-      <h1>Predict how AI systems fail — before they do</h1>
+      <h1>Predict how your AI agent will fail — before it happens</h1>
       <p>Failure is not random. It is structural.</p>
     </header>
 
-    <section aria-labelledby="prob-h">
-      <div class="section-label">01</div>
-      <h2 id="prob-h">The Problem</h2>
-      <div class="prose">
-        <p>Most AI tools optimize performance.<br /><strong>None explain failure.</strong></p>
-        <p>Agents don't fail randomly —<br />they collapse when complexity exceeds control.</p>
+    <section>
+      <div class="section-label">失败类型</div>
+      <h2>你的 Agent 最可能以哪种方式崩溃？</h2>
+      <div class="failure-grid">
+        <div class="failure-card"><h3 class="exp">EXPLOSION</h3><p>复杂度失控，调用或资源迅速爆炸</p></div>
+        <div class="failure-card"><h3 class="loop">LOOP</h3><p>陷入反复震荡或死循环</p></div>
+        <div class="failure-card"><h3 class="drift">DRIFT</h3><p>目标逐渐偏离，最终跑偏</p></div>
+        <div class="failure-card"><h3 class="exp">COLLAPSE</h3><p>控制力突然丧失</p></div>
+        <div class="failure-card"><h3 class="stable">STABLE</h3><p>目前结构相对稳定（但仍可能有隐患）</p></div>
       </div>
     </section>
 
-    <section aria-labelledby="sol-h">
-      <div class="section-label">02</div>
-      <h2 id="sol-h">The Solution</h2>
-      <p class="solution-lead">A structural failure predictor for AI agents</p>
-    </section>
-
-    <section aria-labelledby="demo-h">
+    <section>
       <div class="section-label">03</div>
-      <h2 id="demo-h">Demo</h2>
-      <div class="demo-grid">
-        <div class="card">
+      <h2>试一试</h2>
+      <div class="demo">
+        <div class="input-grid">
           <div class="field">
-            <label for="tool">Tool Usage</label>
-            <input type="range" id="tool" min="0" max="100" value="85" />
-            <div class="hint"><span id="toolVal">85</span> / 100</div>
-          </div>
-          <div class="field">
-            <div class="toggle-line">
-              <span>Memory</span>
-              <label class="sw">
-                <input type="checkbox" id="memory" />
-                <span class="sw-ui"></span>
-              </label>
-            </div>
-            <div class="hint">Off = no accumulation buffer</div>
-          </div>
-          <div class="field">
-            <div class="toggle-line">
-              <span>Reflection</span>
-              <label class="sw">
-                <input type="checkbox" id="reflection" checked />
-                <span class="sw-ui"></span>
-              </label>
-            </div>
-          </div>
-          <div class="field">
-            <label for="depth">Depth Limit</label>
-            <select id="depth">
-              <option value="bounded">bounded</option>
-              <option value="unbounded" selected>unbounded</option>
+            <label>Tool Usage</label>
+            <select id="tool">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high" selected>High</option>
             </select>
           </div>
-          <button type="button" class="btn" id="analyze">Analyze</button>
-        </div>
-        <div class="card">
-          <div class="out-k">Prediction</div>
-          <p class="out-pred exp" id="pred">→ EXPLOSION</p>
-          <div class="out-k">Onset</div>
-          <p class="out-v" id="onset">→ Early</p>
-          <div class="out-k">Reason</div>
-          <p class="out-v" id="reason">→ Uncontrolled tool recursion</p>
-          <div class="out-k">Causal Path</div>
-          <p class="out-v" id="path">→ Complexity ↑ → Control ↓ → Collapse</p>
-        </div>
-      </div>
-    </section>
-
-    <section aria-labelledby="viz-h">
-      <div class="section-label">04</div>
-      <h2 id="viz-h">Visualization</h2>
-      <div class="viz-grid">
-        <div class="card viz-card">
-          <h3>Trajectory (time)</h3>
-          <div class="traj" id="traj">
-            <span class="node c1">Start</span>
-            <span class="arr">→</span>
-            <span class="node c2">Load ↑</span>
-            <span class="arr">→</span>
-            <span class="node c3">Control ↓</span>
-            <span class="arr">→</span>
-            <span class="node c4">Failure</span>
+          <div class="field">
+            <label>Memory</label>
+            <select id="memory">
+              <option value="none">None</option>
+              <option value="short">Short-term</option>
+              <option value="long" selected>Long-term</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Reflection</label>
+            <select id="reflection">
+              <option value="off">Off</option>
+              <option value="on" selected>On</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Goal Clarity</label>
+            <select id="goal">
+              <option value="vague">Vague</option>
+              <option value="clear" selected>Clear</option>
+            </select>
           </div>
         </div>
-        <div class="card viz-card">
-          <h3>Phase Map (space)</h3>
-          <div class="phase-box">
-            <div class="phase-inner">
-              <div class="phase-dot" id="dot"></div>
-            </div>
-          </div>
-          <p class="phase-cap">C = tool intensity · S = memory + reflection (control)</p>
+
+        <button class="btn" id="analyze">预测失败模式</button>
+
+        <div class="result" id="result" style="display:none;">
+          <p class="pred" id="prediction"></p>
+          <p class="confidence" id="confidence"></p>
+          <p><strong>原因：</strong> <span id="reason"></span></p>
+          <p><strong>建议关注：</strong> <span id="suggestion"></span></p>
         </div>
-      </div>
-    </section>
-
-    <section aria-labelledby="ex-h">
-      <div class="section-label">05</div>
-      <h2 id="ex-h">Real-world agent failures</h2>
-      <div class="examples-scroll" role="list">
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
-          <h3 class="ex-title">OpenClaw-like</h3>
-          <p class="ex-pred exp">→ EXPLOSION</p>
-          <p class="ex-reason">Unbounded tool recursion</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
-          <h3 class="ex-title">Tencent Lobster-like</h3>
-          <p class="ex-pred drift">→ DRIFT</p>
-          <p class="ex-reason">Goal instability</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
-          <h3 class="ex-title">AutoGPT-like</h3>
-          <p class="ex-pred exp">→ EXPLOSION</p>
-          <p class="ex-reason">Tool explosion</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
-          <h3 class="ex-title">BabyAGI-like</h3>
-          <p class="ex-pred exp">→ EXPLOSION</p>
-          <p class="ex-reason">Task recursion</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
-          <h3 class="ex-title">OpenDevin-like</h3>
-          <p class="ex-pred drift">→ DRIFT</p>
-          <p class="ex-reason">Goal drift</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-hot">🔥 Hot</span>
-          <h3 class="ex-title">MCP-heavy agent</h3>
-          <p class="ex-pred exp">→ EXPLOSION</p>
-          <p class="ex-reason">Connector amplification</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-fw">⚙️ Framework</span>
-          <h3 class="ex-title">LangChain Agent</h3>
-          <p class="ex-pred loop">→ LOOP</p>
-          <p class="ex-reason">No reflection</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-fw">⚙️ Framework</span>
-          <h3 class="ex-title">CAMEL Multi-Agent</h3>
-          <p class="ex-pred exp">→ EXPLOSION</p>
-          <p class="ex-reason">Multi-agent amplification</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-fw">⚙️ Framework</span>
-          <h3 class="ex-title">CrewAI</h3>
-          <p class="ex-pred stable">→ STABLE</p>
-          <p class="ex-reason">Structured workflow</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-fw">⚙️ Framework</span>
-          <h3 class="ex-title">Semantic Kernel Agent</h3>
-          <p class="ex-pred loop">→ LOOP</p>
-          <p class="ex-reason">Planner loop without termination</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-base">🧪 Baseline</span>
-          <h3 class="ex-title">Stable Agent</h3>
-          <p class="ex-pred stable">→ STABLE</p>
-          <p class="ex-reason">Controlled system</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-base">🧪 Baseline</span>
-          <h3 class="ex-title">Memory+Reflection Agent</h3>
-          <p class="ex-pred stable">→ STABLE</p>
-          <p class="ex-reason">Balanced dynamics</p>
-        </article>
-        <article class="ex-card" role="listitem">
-          <span class="ex-tag ex-tag-base">🧪 Baseline</span>
-          <h3 class="ex-title">Single-tool ReAct</h3>
-          <p class="ex-pred stable">→ STABLE</p>
-          <p class="ex-reason">Narrow action space</p>
-        </article>
-      </div>
-    </section>
-
-    <section aria-labelledby="how-h">
-      <div class="section-label">06</div>
-      <h2 id="how-h">How it works</h2>
-      <div class="explain-box">
-        <p>We model agent behavior using:</p>
-        <p><code>C</code> = Complexity<br /><code>S</code> = Control</p>
-        <p>Failure occurs when:</p>
-        <p><strong>C grows faster than S can stabilize</strong></p>
       </div>
     </section>
 
     <footer>
-      <p>This is not a monitoring tool.<br />This is a failure predictor.</p>
+      <p>这是一个失败预测器，不是性能优化工具。<br>
+      它只回答一个问题：你的 Agent 会以哪种方式失败？</p>
     </footer>
   </div>
 
   <script>
-    (function () {
-      function $(id) {
-        return document.getElementById(id);
+    const analyzeBtn = document.getElementById('analyze');
+    const resultDiv = document.getElementById('result');
+
+    analyzeBtn.addEventListener('click', () => {
+      const tool = document.getElementById('tool').value;
+      const memory = document.getElementById('memory').value;
+      const reflection = document.getElementById('reflection').value;
+      const goal = document.getElementById('goal').value;
+
+      // 简单规则示例（后续可替换为你的后端逻辑）
+      let prediction = "DRIFT";
+      let confidence = "68%";
+      let reason = "目标定义不够清晰，且长期记忆缺失";
+      let suggestion = "加强 Goal Clarity 和 Reflection 机制";
+
+      if (tool === "high" && reflection === "off") {
+        prediction = "EXPLOSION";
+        confidence = "82%";
+        reason = "高强度工具调用 + 无反思机制";
+        suggestion = "立即增加调用深度限制和反思步骤";
+      } else if (memory === "none" && goal === "vague") {
+        prediction = "DRIFT";
+      } else if (reflection === "on" && tool === "medium") {
+        prediction = "STABLE";
+        confidence = "71%";
+        reason = "反思机制有效平衡了工具使用";
+        suggestion = "可继续保持当前结构";
       }
 
-      function compute(T, M, R, D) {
-        if (T > 70 && D === "unbounded" && !M) {
-          return {
-            type: "EXPLOSION",
-            cls: "out-pred exp",
-            onset: "Early",
-            reason: "Uncontrolled tool recursion",
-            path: "Complexity ↑ → Control ↓ → Collapse",
-            traj: ["Start", "Load ↑", "Control ↓", "Failure"],
-            trajDanger: true
-          };
-        }
-        if (!R && !M) {
-          return {
-            type: "LOOP",
-            cls: "out-pred loop",
-            onset: "Mid",
-            reason: "No reflection leads to repetition",
-            path: "Execution ↑ → Termination ↓ → Loop",
-            traj: ["Start", "Repeat", "Stall", "Loop"],
-            trajDanger: true
-          };
-        }
-        if (T < 40 && M) {
-          return {
-            type: "STABLE",
-            cls: "out-pred ok",
-            onset: "-",
-            reason: "System controlled",
-            path: "Bounded operation → Sustained control → Equilibrium",
-            traj: ["Start", "Balance", "Hold", "Stable"],
-            trajDanger: false
-          };
-        }
-        return {
-          type: "DRIFT",
-          cls: "out-pred drift",
-          onset: "Late",
-          reason: "Goal instability",
-          path: "Objective noise ↑ → Coupling loss → Drift",
-          traj: ["Start", "Skew", "Drift", "Misalign"],
-          trajDanger: true
-        };
-      }
+      document.getElementById('prediction').textContent = prediction;
+      document.getElementById('confidence').innerHTML = `置信度：${confidence}`;
+      document.getElementById('reason').textContent = reason;
+      document.getElementById('suggestion').textContent = suggestion;
 
-      function renderTraj(labels, danger) {
-        var t = $("traj");
-        t.innerHTML = "";
-        var classes = danger
-          ? ["c1", "c2", "c3", "c4"]
-          : ["c1", "c2", "c3", "ok4"];
-        for (var i = 0; i < labels.length; i++) {
-          if (i > 0) {
-            var a = document.createElement("span");
-            a.className = "arr";
-            a.textContent = "→";
-            t.appendChild(a);
-          }
-          var n = document.createElement("span");
-          n.className = "node " + classes[i];
-          n.textContent = labels[i];
-          t.appendChild(n);
-        }
-      }
-
-      function phaseDot(T, M, R) {
-        var C = T / 100;
-        var S = (M ? 0.5 : 0) + (R ? 0.5 : 0);
-        $("dot").style.left = C * 100 + "%";
-        $("dot").style.top = (1 - S) * 100 + "%";
-      }
-
-      function run() {
-        var T = parseInt($("tool").value, 10);
-        var M = $("memory").checked;
-        var R = $("reflection").checked;
-        var D = $("depth").value;
-        var o = compute(T, M, R, D);
-
-        $("pred").textContent = "→ " + o.type;
-        $("pred").className = o.cls;
-        $("onset").textContent = "→ " + o.onset;
-        $("reason").textContent = "→ " + o.reason;
-        $("path").textContent = "→ " + o.path;
-        renderTraj(o.traj, o.trajDanger);
-        phaseDot(T, M, R);
-      }
-
-      $("tool").addEventListener("input", function () {
-        $("toolVal").textContent = this.value;
-      });
-      $("analyze").addEventListener("click", run);
-      $("toolVal").textContent = $("tool").value;
-      run();
-    })();
+      resultDiv.style.display = 'block';
+    });
   </script>
 </body>
 </html>
