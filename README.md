@@ -96,6 +96,7 @@ Agent 的失败不是随机的，而是**结构性的**。
 目前还处于早期实验阶段。
 
 如果你有使用中的案例、发现的 bug，或者对失败模式的看法，欢迎 Issue 或 Pull Request。
+https://failure-predictor-web.vercel.app/
 
 ---
 
