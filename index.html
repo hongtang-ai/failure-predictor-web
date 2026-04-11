@@ -7,14 +7,14 @@
   <style>
     :root {
       --bg: #ffffff;
-      --surface: #fafafa;
+      --surface: #f8fafc;
       --text: #0f172a;
       --muted: #64748b;
       --border: #e2e8f0;
-      --accent: #0f172a;
-      --red: #dc2626;
-      --amber: #b45309;
-      --green: #15803d;
+      --accent: #1e2937;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --green: #22c55e;
     }
 
     * { box-sizing: border-box; }
@@ -26,16 +26,20 @@
       line-height: 1.6;
     }
 
-    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
 
     .hero {
-      padding: 80px 0 60px;
+      padding: 90px 0 70px;
       text-align: center;
       border-bottom: 1px solid var(--border);
     }
 
     .hero h1 {
-      font-size: clamp(32px, 6vw, 48px);
+      font-size: clamp(36px, 5.5vw, 52px);
       font-weight: 700;
       letter-spacing: -0.04em;
       line-height: 1.1;
@@ -43,42 +47,49 @@
     }
 
     .hero p {
-      font-size: 20px;
+      font-size: 21px;
       color: var(--muted);
-      max-width: 32em;
+      max-width: 36em;
       margin: 0 auto;
     }
 
-    section { padding: 60px 0; border-bottom: 1px solid var(--border); }
+    section { padding: 64px 0; border-bottom: 1px solid var(--border); }
 
     .section-label {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 24px; }
+    h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 32px;
+    }
 
     .failure-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
-      margin: 32px 0;
+      margin-bottom: 48px;
     }
 
     .failure-card {
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 24px;
-      background: var(--surface);
+      text-align: center;
     }
 
     .failure-card h3 {
       margin: 0 0 8px;
-      font-size: 20px;
+      font-size: 21px;
+      font-weight: 700;
     }
 
     .exp { color: var(--red); }
@@ -90,66 +101,75 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 40px;
-      margin: 40px 0;
+      padding: 48px 40px;
     }
 
     .input-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 28px;
-    }
-
-    .field {
-      margin-bottom: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
     }
 
     .field label {
       display: block;
       font-weight: 600;
       margin-bottom: 8px;
-      font-size: 14px;
+      font-size: 14.5px;
     }
 
-    select, input[type="range"] {
+    select {
       width: 100%;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 15px;
+      background: white;
     }
 
     .btn {
       width: 100%;
-      padding: 14px;
+      margin-top: 32px;
+      padding: 16px;
       background: var(--accent);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background: #1e2937;
     }
 
     .result {
-      margin-top: 40px;
-      padding: 32px;
+      margin-top: 48px;
+      padding: 36px;
       background: white;
       border: 1px solid var(--border);
       border-radius: 12px;
+      display: none;
     }
 
     .pred {
-      font-size: 42px;
+      font-size: 48px;
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.04em;
       margin: 0 0 12px;
+      line-height: 1.1;
     }
 
     .confidence {
       font-size: 15px;
       color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .reason {
+      font-size: 16px;
+      line-height: 1.55;
+      color: #334155;
     }
 
     footer {
@@ -172,11 +192,11 @@
       <div class="section-label">失败类型</div>
       <h2>你的 Agent 最可能以哪种方式崩溃？</h2>
       <div class="failure-grid">
-        <div class="failure-card"><h3 class="exp">EXPLOSION</h3><p>复杂度失控，调用或资源迅速爆炸</p></div>
+        <div class="failure-card"><h3 class="exp">EXPLOSION</h3><p>复杂度或工具调用失控爆炸</p></div>
         <div class="failure-card"><h3 class="loop">LOOP</h3><p>陷入反复震荡或死循环</p></div>
         <div class="failure-card"><h3 class="drift">DRIFT</h3><p>目标逐渐偏离，最终跑偏</p></div>
         <div class="failure-card"><h3 class="exp">COLLAPSE</h3><p>控制力突然丧失</p></div>
-        <div class="failure-card"><h3 class="stable">STABLE</h3><p>目前结构相对稳定（但仍可能有隐患）</p></div>
+        <div class="failure-card"><h3 class="stable">STABLE</h3><p>目前结构相对稳定</p></div>
       </div>
     </section>
 
@@ -186,7 +206,7 @@
       <div class="demo">
         <div class="input-grid">
           <div class="field">
-            <label>Tool Usage</label>
+            <label>Tool Usage（工具使用强度）</label>
             <select id="tool">
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -194,7 +214,7 @@
             </select>
           </div>
           <div class="field">
-            <label>Memory</label>
+            <label>Memory（记忆机制）</label>
             <select id="memory">
               <option value="none">None</option>
               <option value="short">Short-term</option>
@@ -202,28 +222,43 @@
             </select>
           </div>
           <div class="field">
-            <label>Reflection</label>
+            <label>Reflection（反思机制）</label>
             <select id="reflection">
               <option value="off">Off</option>
               <option value="on" selected>On</option>
             </select>
           </div>
           <div class="field">
-            <label>Goal Clarity</label>
+            <label>Goal Clarity（目标清晰度）</label>
             <select id="goal">
               <option value="vague">Vague</option>
               <option value="clear" selected>Clear</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Depth Limit（调用深度）</label>
+            <select id="depth">
+              <option value="bounded">Bounded</option>
+              <option value="unbounded" selected>Unbounded</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>External Exposure（对外暴露程度）</label>
+            <select id="exposure">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
             </select>
           </div>
         </div>
 
         <button class="btn" id="analyze">预测失败模式</button>
 
-        <div class="result" id="result" style="display:none;">
-          <p class="pred" id="prediction"></p>
-          <p class="confidence" id="confidence"></p>
-          <p><strong>原因：</strong> <span id="reason"></span></p>
-          <p><strong>建议关注：</strong> <span id="suggestion"></span></p>
+        <div class="result" id="result">
+          <p class="pred" id="prediction">——</p>
+          <p class="confidence" id="confidence">置信度：——</p>
+          <p class="reason" id="reason">——</p>
+          <p><strong>建议关注：</strong> <span id="suggestion">——</span></p>
         </div>
       </div>
     </section>
@@ -231,6 +266,9 @@
     <footer>
       <p>这是一个失败预测器，不是性能优化工具。<br>
       它只回答一个问题：你的 Agent 会以哪种方式失败？</p>
+      <p style="margin-top: 20px;">
+        <a href="mailto:kingtmn1@gmail.com">联系我：kingtmn1@gmail.com</a>
+      </p>
     </footer>
   </div>
 
@@ -243,29 +281,34 @@
       const memory = document.getElementById('memory').value;
       const reflection = document.getElementById('reflection').value;
       const goal = document.getElementById('goal').value;
+      const depth = document.getElementById('depth').value;
+      const exposure = document.getElementById('exposure').value;
 
-      // 简单规则示例（后续可替换为你的后端逻辑）
+      // 这里是简单规则示例，后续可替换为调用你的 Python 后端
       let prediction = "DRIFT";
-      let confidence = "68%";
-      let reason = "目标定义不够清晰，且长期记忆缺失";
-      let suggestion = "加强 Goal Clarity 和 Reflection 机制";
+      let confidence = "67%";
+      let reason = "目标定义模糊，且缺乏足够反思机制";
+      let suggestion = "建议增加 Reflection 并明确 Goal Clarity";
 
       if (tool === "high" && reflection === "off") {
         prediction = "EXPLOSION";
-        confidence = "82%";
-        reason = "高强度工具调用 + 无反思机制";
+        confidence = "84%";
+        reason = "高强度工具调用 + 无反思机制，容易导致失控";
         suggestion = "立即增加调用深度限制和反思步骤";
       } else if (memory === "none" && goal === "vague") {
         prediction = "DRIFT";
-      } else if (reflection === "on" && tool === "medium") {
+        confidence = "75%";
+        reason = "没有记忆机制 + 目标模糊，容易出现目标漂移";
+        suggestion = "增加长期记忆或明确目标定义";
+      } else if (reflection === "on" && depth === "bounded") {
         prediction = "STABLE";
-        confidence = "71%";
-        reason = "反思机制有效平衡了工具使用";
-        suggestion = "可继续保持当前结构";
+        confidence = "72%";
+        reason = "反思机制 + 有限调用深度形成了较好平衡";
+        suggestion = "当前结构相对稳定，可继续观察";
       }
 
       document.getElementById('prediction').textContent = prediction;
-      document.getElementById('confidence').innerHTML = `置信度：${confidence}`;
+      document.getElementById('confidence').textContent = `置信度：${confidence}`;
       document.getElementById('reason').textContent = reason;
       document.getElementById('suggestion').textContent = suggestion;
 
